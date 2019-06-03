@@ -11,3 +11,6 @@ license = "MIT"
 log = "0.4.6"
 simplelog = "0.5.3"
 clap = {version = "2.33.0", features = ["yaml"]}
+rusoto_core = "0.39.0"
+rusoto_s3 = "0.39.0"
+rusoto_rekognition = "0.39.0"
