@@ -1,0 +1,8 @@
+name: image-analytics-bridge
+author: Tim Hütz <tim@huetz.biz>
+about: Tool for basic image analysis, image recognition and image categorization.
+args:
+    - verbose:
+        short: v
+        multiple: true
+help: Sets the level of verbosity

@@ -1,12 +1,7 @@
+use clap::{load_yaml, App};
 use log::{info, LevelFilter};
 use simplelog::{CombinedLogger, Config, TermLogger, WriteLogger};
 use std::fs::File;
-
-#[cfg(debug_assertions)]
-const LOGGING_LEVEL: LevelFilter = LevelFilter::Trace;
-
-#[cfg(not(debug_assertions))]
-const LOGGING_LEVEL: LevelFilter = LevelFilter::Info;
 
 const LOGGING_PATH: &str = "image-analytics-bridge.log";
 
@@ -21,6 +16,17 @@ fn get_version_str() -> String {
 }
 
 fn main() {
+    // configure the command line parser first (since we need the verbosity level for the logger)
+    let cli_configuration_yaml = load_yaml!("cli.yml");
+    let argument_matches = App::from_yaml(cli_configuration_yaml).get_matches();
+
+    // determine the correct logging level
+    let logging_level = match argument_matches.occurrences_of("verbose") {
+        0 => LevelFilter::Info,
+        1 => LevelFilter::Debug,
+        _ => LevelFilter::Trace,
+    };
+
     // be sure that we can create the logfile in the requested path
     let log_file_handle = File::create(LOGGING_PATH);
     if log_file_handle.is_err() {
@@ -31,10 +37,10 @@ fn main() {
     }
 
     // be sure that we could create the terminal logger
-    let terminal_logger = TermLogger::new(LOGGING_LEVEL, Config::default());
+    let terminal_logger = TermLogger::new(logging_level, Config::default());
 
     // create the logger which logs into a file
-    let write_logger = WriteLogger::new(LOGGING_LEVEL, Config::default(), log_file_handle.unwrap());
+    let write_logger = WriteLogger::new(logging_level, Config::default(), log_file_handle.unwrap());
 
     // configure the logging framework and set the corresponding log level
     if terminal_logger.is_some() {
